@@ -13,8 +13,21 @@ const inputElevation = document.querySelector('.form__input--elevation');
 
 let map, mapmark;
 
-navigator.geolocation.getCurrentPosition(
-    function (pos) {
+class App {
+    constructor() {}
+
+    _getPosition() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                this._loadMap,
+                function () {
+                    alert('Could not fetch location!!!');
+                }
+            );
+        }
+    }
+
+    _loadMap(pos) {
         const { latitude, longitude } = pos.coords;
         const coords = [latitude, longitude];
         console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
@@ -24,19 +37,23 @@ navigator.geolocation.getCurrentPosition(
             attribution:
                 '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }).addTo(map);
-
-        map.on('click', function (mapEvent) {
-            const { latlng } = mapEvent;
-            mapmark = [latlng.lat, latlng.lng];
-            form.classList.remove('hidden');
-            inputDistance.focus();
-        });
-    },
-
-    function () {
-        alert('Could not fetch location!!!');
     }
-);
+
+    _showForm() {}
+
+    _toggleElevationField() {}
+
+    _newWorkout() {}
+}
+
+navigator.geolocation.getCurrentPosition(function (pos) {
+    map.on('click', function (mapEvent) {
+        const { latlng } = mapEvent;
+        mapmark = [latlng.lat, latlng.lng];
+        form.classList.remove('hidden');
+        inputDistance.focus();
+    });
+});
 
 form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -61,7 +78,12 @@ form.addEventListener('submit', function (e) {
         .openPopup();
 });
 
-inputType.addEventListener('change', function() {
+inputType.addEventListener('change', function () {
     inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
     inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
 });
+
+
+const app = new App();
+
+app._getPosition();
