@@ -1,3 +1,5 @@
+//jshint esversion:6
+
 'use strict';
 
 // prettier-ignore
@@ -13,14 +15,45 @@ const inputElevation = document.querySelector('.form__input--elevation');
 
 class Workout {
     constructor(coords,distance,duration) {
-        this._coords = coords;
+        this._coords = coords; // [latitude,longitude]
         this._distance = distance; // in km
         this._duration = duration; // in min   
         this._date = new Date();
-        this._id = (new Date() + '').slice(-10);
+        this._id = (Date.now() + '').slice(-10);
     }
 }
 
+class Running extends Workout {
+    constructor(coords,distance,duration,cadance) {
+        super(coords,distance,duration);
+        this._cadence = cadance;
+        this.calcPace();
+    }
+
+    calcPace() {
+        // min/km
+        this._pace = this._duration / this._distance;
+        return this._pace;
+    }
+}
+
+class Cycling extends Workout {
+    constructor(coords,distance,duration,elevationGain) {
+        super(coords,distance,duration);
+        this._elevationGain = elevationGain;
+        this.calcSpeed();
+    }
+
+    calcSpeed() {
+        this._speed = this._distance / (this._duration / 60);
+        return this._speed;
+    }
+}
+
+
+
+////////////////////////////////////////////////////
+// APPLICATION ARCHITECTURE
 class App {
     constructor() {
         this._map = L.map('map');
