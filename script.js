@@ -13,6 +13,30 @@ class Workout {
         this._date = new Date();
         this._id = (Date.now() + '').slice(-10);
     }
+
+    get id() {
+        return this._id;
+    }
+
+    get date() {
+        return this._date;
+    }
+
+    get coords() {
+        return this._coords;
+    }
+
+    get distance() {
+        return this._distance;
+    }
+
+    get duration() {
+        return this._duration;
+    }
+
+    get type() {
+        return this._type;
+    }
 }
 
 class Running extends Workout {
@@ -21,6 +45,10 @@ class Running extends Workout {
         this._type = 'running';
         this._cadence = cadance;
         this.calcPace();
+    }
+
+    get cadance() {
+        return this._cadence;
     }
 
     calcPace() {
@@ -36,6 +64,10 @@ class Cycling extends Workout {
         this._type = 'cycling';
         this._elevationGain = elevationGain;
         this.calcSpeed();
+    }
+
+    get elevationGain() {
+        return this._elevationGain;
     }
 
     calcSpeed() {
@@ -123,8 +155,7 @@ class App {
     }
 
     _newWorkout(e) {
-        const isValid = (...inputs) =>
-            inputs.every(input => Number.isFinite(input));
+        const isValid = (...inputs) => inputs.every(input => Number.isFinite(+input));
         const isPositive = (...inputs) => inputs.every(input => input > 0);
         e.preventDefault();
 
@@ -166,6 +197,7 @@ class App {
 
         //Add object to the workout array
         this._workouts.push(workout);
+
         //Render workout on the map
         this._renderMapMarker(workout);
 
@@ -173,6 +205,7 @@ class App {
 
         //hide the form
 
+        //RESET form
         inputCadence.value =
             inputDistance.value =
             inputDuration.value =
