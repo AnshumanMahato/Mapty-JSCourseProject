@@ -40,14 +40,14 @@ class Workout {
 }
 
 class Running extends Workout {
-    constructor(coords, distance, duration, cadance) {
+    constructor(coords, distance, duration, cadence) {
         super(coords, distance, duration);
         this._type = 'running';
-        this._cadence = cadance;
+        this._cadence = cadence;
         this.calcPace();
     }
 
-    get cadance() {
+    get cadence() {
         return this._cadence;
     }
 
@@ -154,8 +154,41 @@ class App {
             .openPopup();
     }
 
+    _renderWorkout(workout) {
+        let html = `
+            <li class="workout workout--${workout.type}" data-id="${workout.id}">
+            <h2 class="workout__title">Running on April 14</h2>
+            <div class="workout__details">
+              <span class="workout__icon">${workout.type === 'running'? ' 🏃‍♂️' : '🚴‍♀️'}</span>
+              <span class="workout__value">${workout.distance}</span>
+              <span class="workout__unit">km</span>
+            </div>
+            <div class="workout__details">
+              <span class="workout__icon">⏱</span>
+              <span class="workout__value">${workout.duration}</span>
+              <span class="workout__unit">min</span>
+            </div>
+        `;
+
+        if(workout.type === 'running')
+            html += `
+            <div class="workout__details">
+              <span class="workout__icon">⚡️</span>
+              <span class="workout__value">${workout.calcPace().toFixed(1)}</span>
+              <span class="workout__unit">min/km</span>
+            </div>
+            <div class="workout__details">
+              <span class="workout__icon">🦶🏼</span>
+              <span class="workout__value">${workout.cadence}</span>
+              <span class="workout__unit">spm</span>
+            </div>
+            </li>
+            `;
+    }
+
     _newWorkout(e) {
-        const isValid = (...inputs) => inputs.every(input => Number.isFinite(+input));
+        const isValid = (...inputs) =>
+            inputs.every(input => Number.isFinite(+input));
         const isPositive = (...inputs) => inputs.every(input => input > 0);
         e.preventDefault();
 
@@ -176,9 +209,8 @@ class App {
                 return alert('Only postive inputs are supported');
 
             //Create Running Object
-            
-            workout = new Running(this._mapMark,distance,duration,cadence);
 
+            workout = new Running(this._mapMark, distance, duration, cadence);
         }
 
         if (type === 'cycling') {
@@ -192,7 +224,7 @@ class App {
 
             //Create Cycling object
 
-            workout = new Cycling(this._mapMark,distance,duration,elevation);
+            workout = new Cycling(this._mapMark, distance, duration, elevation);
         }
 
         //Add object to the workout array
@@ -202,6 +234,7 @@ class App {
         this._renderMapMarker(workout);
 
         //Render Workout on the list
+        this._renderWorkout(workout);
 
         //hide the form
 
