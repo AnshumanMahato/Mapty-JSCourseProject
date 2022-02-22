@@ -99,6 +99,7 @@ class App {
         this._mapMark = undefined;
         this._mapZoomLevel = 13;
         this._getPosition();
+        this._getLocalStorage();
 
         form.addEventListener('submit', this._newWorkout.bind(this));
         inputType.addEventListener('change', this._toggleElevationField);
@@ -128,6 +129,28 @@ class App {
         }).addTo(this._map);
 
         this._map.on('click', this._showForm.bind(this));
+
+        // this._workouts.forEach(workout => {
+        //     this._renderMapMarker(workout);
+        // });
+
+    }
+
+    _setLocalStorage() {
+        localStorage.setItem('workouts' , JSON.stringify(this._workouts));
+    }
+
+    _getLocalStorage() {
+        const data = JSON.parse(localStorage.getItem('workouts'));
+
+        if(!data) return;
+
+        this._workouts = data;
+
+        this._workouts.forEach(workout => {
+            console.log(workout);
+            this._renderWorkout(workout);
+        });
     }
 
     _moveToView(e) {
@@ -285,6 +308,9 @@ class App {
 
         //hide the form
         this._hideForm();
+
+        //save to local storage
+        this._setLocalStorage();
     }
 }
 
