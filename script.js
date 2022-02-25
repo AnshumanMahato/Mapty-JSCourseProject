@@ -11,7 +11,7 @@ class Workout {
         this._id = (Date.now() + '').slice(-10);
     }
 
-    _setDescription() {
+    setDescription() {
         // prettier-ignore
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         this.description = `${this._type[0].toUpperCase()}${this._type.slice(1)} on ${months[this._date.getMonth()]} ${this._date.getDate()}`;
@@ -23,6 +23,14 @@ class Workout {
 
     get date() {
         return this._date;
+    }
+
+    set date(date) {
+        this._date = new Date(date);
+    }
+
+    set id(id) {
+        this._id = id;
     }
 
     get coords() {
@@ -48,7 +56,7 @@ class Running extends Workout {
         this._type = 'running';
         this._cadence = cadence;
         this.calcPace();
-        this._setDescription();
+        this.setDescription();
     }
 
     get cadence() {
@@ -60,6 +68,14 @@ class Running extends Workout {
         this._pace = this._duration / this._distance;
         return this._pace;
     }
+
+    static classify({_coords,_cadence,_distance,_duration,_date,_id}){
+        let obj = new Running(_coords,_distance,_duration,_cadence);
+        obj.date =  _date;
+        obj.id = _id;
+        obj.setDescription();
+        return obj;
+    }
 }
 
 class Cycling extends Workout {
@@ -68,7 +84,7 @@ class Cycling extends Workout {
         this._type = 'cycling';
         this._elevationGain = elevationGain;
         this.calcSpeed();
-        this._setDescription();
+        this.setDescription();
     }
 
     get elevationGain() {
@@ -78,6 +94,15 @@ class Cycling extends Workout {
     calcSpeed() {
         this._speed = this._distance / (this._duration / 60);
         return this._speed;
+    }
+
+    static classify({_coords,_elevationGain,_distance,_duration,_date,_id}){
+        let obj = new Cycling(_coords,_distance,_duration,_elevationGain);
+        obj.date =  _date;
+        obj.id = _id;
+        obj.setDescription();
+        return obj;
+
     }
 }
 
@@ -141,15 +166,20 @@ class App {
     }
 
     _getLocalStorage() {
-        const data = JSON.parse(localStorage.getItem('workouts'));
+        const dataset = JSON.parse(localStorage.getItem('workouts'));
 
-        if(!data) return;
+        if(!dataset) return;
 
-        this._workouts = data;
+        this._workouts = dataset.map( data => {
+            if(data._type === 'running')
+                return Running.classify(data);
+            if(data._type === 'cycling')
+                return Cycling.classify(data);
+        });
 
         this._workouts.forEach(workout => {
-            console.log(workout);
             this._renderWorkout(workout);
+            this._renderMapMarker(workout);
         });
     }
 
